@@ -6,10 +6,11 @@ function! colortuner#init()
 
   augroup colortuner_colorscheme
     autocmd!
-    autocmd ColorScheme,VimEnter * call colortuner#on_colorscheme()
-    autocmd VimEnter * call colortuner#get_all_colorschemes()
+    autocmd VimEnter * ++once call colortuner#on_vimenter()
+    autocmd VimEnter * ++once call colortuner#get_all_colorschemes()
+    autocmd VimLeave * ++once call colortuner#save()
+    autocmd ColorScheme * call colortuner#on_colorscheme()
     autocmd BufEnter __colortuner__ call colortuner#ui#setup()
-    autocmd VimLeave * call colortuner#save()
   augroup END
 endfunction
 
@@ -25,6 +26,13 @@ endfunction
 
 function! colortuner#save()
   call writefile([string(s:settings)], expand(g:colortuner_filepath))
+endfunction
+
+function! colortuner#on_vimenter()
+  if g:loaded_colortuner_ignore_vim_enter_colorscheme_reload
+      return
+  endif
+  call colortuner#on_colorscheme()
 endfunction
 
 function! colortuner#on_colorscheme()
